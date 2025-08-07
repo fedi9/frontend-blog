@@ -1,0 +1,62 @@
+<h2>Bienvenue Éditeur 🖋️</h2>
+
+<!-- 🔹 Bouton pour ouvrir la pop-up d’ajout -->
+<button (click)="showCreateModal = true" class="btn btn-success">➕ Ajouter un article</button>
+
+<!-- 🟢 POPUP CRÉATION -->
+<div class="modal" *ngIf="showCreateModal">
+  <div class="modal-content">
+    <h3>Créer un nouvel article</h3>
+    <form (ngSubmit)="addArticle()" #createFormRef="ngForm">
+      <input type="text" name="title" [(ngModel)]="newArticle.title" placeholder="Titre" required />
+      <br />
+      <textarea name="content" [(ngModel)]="newArticle.content" placeholder="Contenu" required></textarea>
+      <br />
+      <input type="text" name="image" [(ngModel)]="newArticle.image" placeholder="URL de l’image" />
+      <br />
+      <input type="text" name="tags" [(ngModel)]="newArticle.tags" placeholder="Tags (séparés par des virgules)" />
+      <br />
+      <button type="submit" [disabled]="createFormRef.invalid" class="btn btn-primary">Créer</button>
+      <button type="button" (click)="showCreateModal = false" class="btn btn-secondary">Annuler</button>
+    </form>
+  </div>
+</div>
+
+<!-- 🟡 POPUP MODIFICATION -->
+<div class="modal" *ngIf="showEditModal">
+  <div class="modal-content">
+    <h3>Modifier l’article</h3>
+    <form (ngSubmit)="updateArticle()" #editFormRef="ngForm">
+      <input type="text" name="title" [(ngModel)]="editForm.title" placeholder="Titre" required />
+      <br />
+      <textarea name="content" [(ngModel)]="editForm.content" placeholder="Contenu" required></textarea>
+      <br />
+      <input type="text" name="image" [(ngModel)]="editForm.image" placeholder="URL de l’image" />
+      <br />
+      <input type="text" name="tags" [(ngModel)]="editForm.tags" placeholder="Tags (séparés par des virgules)" />
+      <br />
+      <button type="submit" [disabled]="editFormRef.invalid" class="btn btn-primary">Enregistrer</button>
+      <button type="button" (click)="showEditModal = false" class="btn btn-secondary">Annuler</button>
+    </form>
+  </div>
+</div>
+
+<hr />
+
+<!-- 🔽 Liste des articles -->
+<h3>Liste des articles</h3>
+
+<div *ngIf="loading">Chargement...</div>
+<div *ngIf="!loading && articles.length === 0">Aucun article trouvé.</div>
+
+<div *ngIf="!loading && articles.length > 0">
+  <div *ngFor="let article of articles" class="article-card">
+    <h4>{{ article.title }}</h4>
+    <img [src]="article.image" alt="image" width="150" />
+    <p>{{ article.content }}</p>
+    <p><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</p>
+    <p><strong>Tags :</strong> {{ article.tags.join(', ') }}</p>
+
+    <button class="btn btn-primary" (click)="openEditModal(article)">Modifier</button>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+
+<nav class="navbar">
+  <a routerLink="/home">Home</a>
+
+  <ng-container *ngIf="!isLoggedIn(); else loggedInLinks">
+    <a routerLink="/login">Login</a>
+    <a routerLink="/register">Register</a>
+  </ng-container>
+
+  <ng-template #loggedInLinks>
+    <a [routerLink]="getDashboardRoute()">Dashboard</a>
+    <button (click)="logout()">Logout</button>
+  </ng-template>
+</nav>

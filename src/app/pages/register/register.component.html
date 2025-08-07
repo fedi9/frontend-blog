@@ -1,0 +1,20 @@
+<h2>Créer un compte</h2>
+
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <label>Nom d'utilisateur</label>
+  <input type="text" formControlName="username" />
+
+  <label>Email</label>
+  <input type="email" formControlName="email" />
+
+  <label>Mot de passe</label>
+  <input type="password" formControlName="password" />
+
+  <label>Rôle</label>
+  <select formControlName="role">
+    <option value="">-- Choisir un rôle --</option>
+    <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+  </select>
+
+  <button type="submit" [disabled]="registerForm.invalid">S'inscrire</button>
+</form>

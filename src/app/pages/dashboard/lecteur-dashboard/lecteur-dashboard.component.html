@@ -1,0 +1,41 @@
+<h2>Bienvenue Lecteur 📖</h2>
+
+<!-- 🔹 Bouton pour ouvrir la pop-up d’ajout -->
+<button (click)="showCreateModal = true" class="btn btn-success">➕ Ajouter un article</button>
+
+<!-- 🟢 POPUP CREATION ARTICLE -->
+<div class="modal" *ngIf="showCreateModal">
+  <div class="modal-content">
+    <h3>Créer un nouvel article</h3>
+    <form (ngSubmit)="addArticle()" #formRef="ngForm">
+      <input type="text" name="title" [(ngModel)]="newArticle.title" placeholder="Titre" required />
+      <br />
+      <textarea name="content" [(ngModel)]="newArticle.content" placeholder="Contenu" required></textarea>
+      <br />
+      <input type="text" name="image" [(ngModel)]="newArticle.image" placeholder="URL de l’image" />
+      <br />
+      <input type="text" name="tags" [(ngModel)]="newArticle.tags" placeholder="Tags (séparés par des virgules)" />
+      <br />
+      <button type="submit" [disabled]="formRef.invalid" class="btn btn-primary">Créer</button>
+      <button type="button" (click)="showCreateModal = false" class="btn btn-secondary">Annuler</button>
+    </form>
+  </div>
+</div>
+
+<hr />
+
+<!-- 🔽 Liste des articles -->
+<h3>Liste des articles</h3>
+
+<div *ngIf="loading">Chargement...</div>
+<div *ngIf="!loading && articles.length === 0">Aucun article trouvé.</div>
+
+<div *ngIf="!loading && articles.length > 0">
+  <div *ngFor="let article of articles" class="article-card">
+    <h4>{{ article.title }}</h4>
+    <img [src]="article.image" alt="image" width="150" />
+    <p>{{ article.content }}</p>
+    <p><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</p>
+    <p><strong>Tags :</strong> {{ article.tags.join(', ') }}</p>
+  </div>
+</div>

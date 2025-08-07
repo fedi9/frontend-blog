@@ -1,0 +1,20 @@
+<h2 class="text-center">📰 Liste des articles</h2>
+
+<!-- <div *ngIf="loading">Chargement...</div>
+
+<div *ngIf="!loading && articles.length === 0">
+  Aucun article disponible.
+</div> -->
+
+<!-- <div class="articles"> -->
+  
+
+  <div *ngFor="let article of articles" class="article-card">
+    <img [src]="article.image" alt="image" width="150" />
+    <h3>{{ article.title }}</h3>
+    <p>{{ article.content }}</p>
+    <p><strong>Auteur:</strong> {{ article.authorDetails?.username || 'Anonyme' }}</p>
+    <p><strong>Tags:</strong> {{ article.tags.join(', ') }}</p>
+    <hr />
+  </div>
+<!-- </div> -->
