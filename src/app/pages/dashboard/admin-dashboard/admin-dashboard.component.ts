@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ArticleService, PaginatedResponse } from 'src/app/core/services/article.service';
+import { UserService, User, PaginatedUserResponse } from 'src/app/core/services/user.service';
 import { Article } from 'src/app/core/models/article.model';
 
 @Component({
@@ -16,7 +17,7 @@ export class AdminDashboardComponent implements OnInit {
   currentPage = 1;
   totalPages = 1;
   totalArticles = 0;
-  articlesPerPage = 8; // 8 articles par page
+  articlesPerPage = 8;
 
   // Search properties
   searchTerm = '';
@@ -45,11 +46,35 @@ export class AdminDashboardComponent implements OnInit {
     tags: ''
   };
 
-  constructor(private articleService: ArticleService) {}
+  // Utilisateurs
+  users: User[] = [];
+  usersLoading = true;
+
+  // Pagination utilisateurs
+  userCurrentPage = 1;
+  userTotalPages = 1;
+  totalUsers = 0;
+  usersPerPage = 8;
+
+  // Recherche utilisateurs
+  userSearchTerm = '';
+  selectedUserRole = '';
+
+  // Modals utilisateurs
+  showEditUserModal = false;
+  showDeleteUserModal = false;
+  selectedUser: User | null = null;
+  newUserRole = '';
+
+  constructor(
+    private articleService: ArticleService,
+    private userService: UserService
+  ) {}
 
   ngOnInit(): void {
     this.loadArticles();
     this.loadAvailableTags();
+    this.loadUsers();
   }
 
   loadArticles(page: number = 1): void {
@@ -66,6 +91,24 @@ export class AdminDashboardComponent implements OnInit {
       error: (err) => {
         console.error('Erreur lors du chargement des articles :', err);
         this.loading = false;
+      }
+    });
+  }
+
+  loadUsers(page: number = 1): void {
+    this.usersLoading = true;
+    this.userCurrentPage = page;
+    
+    this.userService.getAllUsers(page, this.usersPerPage, this.userSearchTerm, this.selectedUserRole).subscribe({
+      next: (data: PaginatedUserResponse) => {
+        this.users = data.users;
+        this.userTotalPages = data.totalPages;
+        this.totalUsers = data.total;
+        this.usersLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des utilisateurs :', err);
+        this.usersLoading = false;
       }
     });
   }
@@ -101,6 +144,24 @@ export class AdminDashboardComponent implements OnInit {
     this.loadArticles();
   }
 
+  // User search methods
+  onUserSearch(): void {
+    this.userCurrentPage = 1;
+    this.loadUsers();
+  }
+
+  onUserRoleChange(): void {
+    this.userCurrentPage = 1;
+    this.loadUsers();
+  }
+
+  clearUserSearch(): void {
+    this.userSearchTerm = '';
+    this.selectedUserRole = '';
+    this.userCurrentPage = 1;
+    this.loadUsers();
+  }
+
   // Pagination methods
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
@@ -126,6 +187,43 @@ export class AdminDashboardComponent implements OnInit {
     
     let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  // User pagination methods
+  goToUserPage(page: number): void {
+    if (page >= 1 && page <= this.userTotalPages) {
+      this.loadUsers(page);
+    }
+  }
+
+  nextUserPage(): void {
+    if (this.userCurrentPage < this.userTotalPages) {
+      this.goToUserPage(this.userCurrentPage + 1);
+    }
+  }
+
+  previousUserPage(): void {
+    if (this.userCurrentPage > 1) {
+      this.goToUserPage(this.userCurrentPage - 1);
+    }
+  }
+
+  getUserPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, this.userCurrentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.userTotalPages, startPage + maxVisiblePages - 1);
     
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -204,6 +302,65 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur lors de la suppression:', err);
+      }
+    });
+  }
+
+  // User management methods
+  openEditUserModal(user: User): void {
+    this.selectedUser = user;
+    this.newUserRole = user.role; // Pré-remplir avec le rôle actuel
+    this.showEditUserModal = true;
+  }
+
+  updateUserRole(): void {
+    if (!this.selectedUser || !this.newUserRole) return;
+
+    const username = this.selectedUser.username; // Stocker le nom avant de le supprimer
+
+    this.userService.updateUserRole(this.selectedUser._id, this.newUserRole).subscribe({
+      next: (response) => {
+        console.log('Rôle modifié avec succès:', response.message);
+        // Recharger la liste des utilisateurs
+        this.loadUsers(this.userCurrentPage);
+        this.showEditUserModal = false;
+        this.selectedUser = null;
+        this.newUserRole = '';
+        
+        // Afficher un message de succès (vous pouvez ajouter un toast/notification)
+        alert(`Rôle de ${username} modifié avec succès !`);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la modification du rôle:', err);
+        alert('Erreur lors de la modification du rôle: ' + (err.error?.message || err.message));
+      }
+    });
+  }
+
+  openDeleteUserModal(user: User): void {
+    this.selectedUser = user;
+    this.showDeleteUserModal = true;
+  }
+
+  deleteUser(): void {
+    if (!this.selectedUser) return;
+
+    const username = this.selectedUser.username; // Stocker le nom avant de le supprimer
+
+    this.userService.deleteUser(this.selectedUser._id).subscribe({
+      next: () => {
+        console.log('Utilisateur supprimé avec succès');
+        // Recharger la liste des utilisateurs
+        this.loadUsers(this.userCurrentPage);
+        this.showDeleteUserModal = false;
+        this.selectedUser = null;
+        
+        // Afficher un message de succès
+        alert(`Utilisateur ${username} supprimé avec succès !`);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la suppression:', err);
+        alert('Erreur lors de la suppression: ' + (err.error?.message || err.message));
       }
     });
   }

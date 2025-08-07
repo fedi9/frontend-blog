@@ -3,7 +3,7 @@
     <span class="material-icons admin-dashboard-icon">admin_panel_settings</span>
     <h2>Bienvenue Admin 👑</h2>
     <p class="admin-dashboard-intro">
-      Gérez, supervisez et contrôlez tous les articles de la communauté avec des privilèges complets !
+      Gérez, supervisez et contrôlez tous les articles et utilisateurs de la communauté avec des privilèges complets !
     </p>
   </div>
 
@@ -118,6 +118,54 @@
     </div>
   </div>
 
+  <!-- POPUP MODIFICATION RÔLE UTILISATEUR -->
+  <div class="admin-modal-bg" *ngIf="showEditUserModal">
+    <div class="admin-modal">
+      <h3>Modifier le rôle de l'utilisateur</h3>
+      <div class="user-info">
+        <p><strong>Utilisateur :</strong> {{ selectedUser?.username }}</p>
+        <p><strong>Email :</strong> {{ selectedUser?.email }}</p>
+        <p><strong>Rôle actuel :</strong> <span class="user-role user-role-{{ selectedUser?.role?.toLowerCase() || '' }}">{{ selectedUser?.role || 'Non défini' }}</span></p>
+      </div>
+      
+      <form (ngSubmit)="updateUserRole()" #editUserFormRef="ngForm">
+        <label for="new-role">Nouveau rôle</label>
+        <select 
+          id="new-role" 
+          name="newRole" 
+          [(ngModel)]="newUserRole" 
+          required 
+          class="role-select">
+          <option value="">Sélectionnez un rôle</option>
+          <option value="Admin">Admin</option>
+          <option value="Editeur">Éditeur</option>
+          <option value="Redacteur">Rédacteur</option>
+          <option value="Lecteur">Lecteur</option>
+        </select>
+        
+        <div class="admin-modal-actions">
+          <button type="submit" [disabled]="editUserFormRef.invalid || !newUserRole" class="admin-btn-primary">
+            Modifier le rôle
+          </button>
+          <button type="button" (click)="showEditUserModal = false" class="admin-btn-secondary">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- POPUP DE SUPPRESSION UTILISATEUR -->
+  <div class="admin-modal-bg" *ngIf="showDeleteUserModal">
+    <div class="admin-modal">
+      <h3>Confirmation de suppression</h3>
+      <p>Êtes-vous sûr de vouloir supprimer l'utilisateur : <strong>{{ selectedUser?.username }}</strong> ?</p>
+      <p class="warning-text">⚠️ Cette action est irréversible et supprimera définitivement l'utilisateur.</p>
+      <div class="admin-modal-actions">
+        <button (click)="deleteUser()" class="admin-btn-danger">Oui, Supprimer</button>
+        <button (click)="showDeleteUserModal = false" class="admin-btn-secondary">Annuler</button>
+      </div>
+    </div>
+  </div>
+
   <hr />
 
   <!-- Liste des articles -->
@@ -157,7 +205,7 @@
     </div>
   </div>
 
-  <!-- Pagination -->
+  <!-- Pagination des articles -->
   <div *ngIf="!loading && totalPages > 1" class="admin-pagination">
     <div class="pagination-info">
       <span>Page {{ currentPage }} sur {{ totalPages }}</span>
@@ -187,6 +235,132 @@
         class="pagination-btn" 
         [disabled]="currentPage === totalPages"
         (click)="nextPage()">
+        Suivant
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Section Utilisateurs -->
+  <hr class="section-divider" />
+
+  <h3 class="admin-section-title">Liste des utilisateurs</h3>
+
+  <!-- Barre de recherche utilisateurs -->
+  <div class="admin-search-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <span class="material-icons search-icon">search</span>
+        <input 
+          type="text" 
+          [(ngModel)]="userSearchTerm" 
+          (keyup.enter)="onUserSearch()"
+          placeholder="Rechercher par nom d'utilisateur ou email..." 
+          class="search-input" />
+        <button 
+          *ngIf="userSearchTerm" 
+          (click)="userSearchTerm = ''; onUserSearch()" 
+          class="clear-search-btn">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="tag-filter-group">
+        <span class="material-icons filter-icon">filter_list</span>
+        <select 
+          [(ngModel)]="selectedUserRole" 
+          (change)="onUserRoleChange()" 
+          class="tag-select">
+          <option value="">Tous les rôles</option>
+          <option value="Admin">Admin</option>
+          <option value="Editeur">Éditeur</option>
+          <option value="Redacteur">Rédacteur</option>
+          <option value="Lecteur">Lecteur</option>
+        </select>
+      </div>
+      
+      <button 
+        *ngIf="userSearchTerm || selectedUserRole" 
+        (click)="clearUserSearch()" 
+        class="clear-all-btn">
+        <span class="material-icons">clear_all</span>
+        Effacer
+      </button>
+    </div>
+    
+    <div *ngIf="userSearchTerm || selectedUserRole" class="search-results-info">
+      <span *ngIf="userSearchTerm">Recherche : "{{ userSearchTerm }}"</span>
+      <span *ngIf="selectedUserRole">Rôle : {{ selectedUserRole }}</span>
+      <span>• {{ totalUsers }} utilisateur(s)</span>
+    </div>
+  </div>
+
+  <div *ngIf="usersLoading" class="admin-loading">Chargement des utilisateurs...</div>
+  <div *ngIf="!usersLoading && users.length === 0" class="admin-empty">Aucun utilisateur trouvé.</div>
+
+  <div *ngIf="!usersLoading && users.length > 0" class="admin-users-list">
+    <div *ngFor="let user of users" class="user-card">
+      <div class="user-avatar">
+        <span class="material-icons user-icon">person</span>
+      </div>
+      <div class="user-content">
+        <div class="user-field">
+          <strong class="field-label">Nom d'utilisateur :</strong>
+          <h4 class="user-username">{{ user.username }}</h4>
+        </div>
+        <div class="user-field">
+          <strong class="field-label">Email :</strong>
+          <p class="user-email">{{ user.email }}</p>
+        </div>
+        <div class="user-meta">
+          <span><strong>Rôle :</strong> <span class="user-role user-role-{{ user.role.toLowerCase() }}">{{ user.role }}</span></span>
+          <span><strong>Inscrit le :</strong> {{ user.createdAt | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="admin-actions">
+        <button class="admin-btn-edit" (click)="openEditUserModal(user)">
+          <span class="material-icons">edit</span>
+          Modifier
+        </button>
+        <button class="admin-btn-delete" (click)="openDeleteUserModal(user)">
+          <span class="material-icons">delete</span>
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination des utilisateurs -->
+  <div *ngIf="!usersLoading && userTotalPages > 1" class="admin-pagination">
+    <div class="pagination-info">
+      <span>Page {{ userCurrentPage }} sur {{ userTotalPages }}</span>
+      <span>{{ totalUsers }} utilisateurs au total</span>
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        [disabled]="userCurrentPage === 1"
+        (click)="previousUserPage()">
+        <span class="material-icons">chevron_left</span>
+        Précédent
+      </button>
+      
+      <div class="pagination-numbers">
+        <button 
+          *ngFor="let page of getUserPageNumbers()"
+          class="pagination-number"
+          [class.active]="page === userCurrentPage"
+          (click)="goToUserPage(page)">
+          {{ page }}
+        </button>
+      </div>
+      
+      <button 
+        class="pagination-btn" 
+        [disabled]="userCurrentPage === userTotalPages"
+        (click)="nextUserPage()">
         Suivant
         <span class="material-icons">chevron_right</span>
       </button>

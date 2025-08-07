@@ -1,20 +1,117 @@
-<h2 class="text-center">📰 Liste des articles</h2>
-
-<!-- <div *ngIf="loading">Chargement...</div>
-
-<div *ngIf="!loading && articles.length === 0">
-  Aucun article disponible.
-</div> -->
-
-<!-- <div class="articles"> -->
-  
-
-  <div *ngFor="let article of articles" class="article-card">
-    <img [src]="article.image" alt="image" width="150" />
-    <h3>{{ article.title }}</h3>
-    <p>{{ article.content }}</p>
-    <p><strong>Auteur:</strong> {{ article.authorDetails?.username || 'Anonyme' }}</p>
-    <p><strong>Tags:</strong> {{ article.tags.join(', ') }}</p>
-    <hr />
+<div class="home-dashboard-bg">
+  <div class="home-dashboard-header">
+    <span class="material-icons home-dashboard-icon">home</span>
+    <h2>Bienvenue sur le Blog Collaboratif</h2>
+    <p class="home-dashboard-intro">
+      Découvrez, lisez et explorez les meilleurs articles de notre communauté !
+    </p>
   </div>
-<!-- </div> -->
+
+  <!-- Barre de recherche -->
+  <div class="home-search-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <span class="material-icons search-icon">search</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (keyup.enter)="onSearch()"
+          placeholder="Rechercher dans les articles..." 
+          class="search-input" />
+        <button 
+          *ngIf="searchTerm" 
+          (click)="searchTerm = ''; onSearch()" 
+          class="clear-search-btn">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="tag-filter-group">
+        <span class="material-icons filter-icon">filter_list</span>
+        <select 
+          [(ngModel)]="selectedTag" 
+          (change)="onTagChange()" 
+          class="tag-select">
+          <option value="">Tous les tags</option>
+          <option *ngFor="let tag of availableTags" [value]="tag">{{ tag }}</option>
+        </select>
+      </div>
+      
+      <button 
+        *ngIf="searchTerm || selectedTag" 
+        (click)="clearSearch()" 
+        class="clear-all-btn">
+        <span class="material-icons">clear_all</span>
+        Effacer
+      </button>
+    </div>
+    
+    <div *ngIf="searchTerm || selectedTag" class="search-results-info">
+      <span *ngIf="searchTerm">Recherche : "{{ searchTerm }}"</span>
+      <span *ngIf="selectedTag">Tag : {{ selectedTag }}</span>
+      <span>• {{ totalArticles }} résultat(s)</span>
+    </div>
+  </div>
+
+  <!-- Liste des articles -->
+  <h3 class="home-section-title">📰 Liste des articles</h3>
+
+  <div *ngIf="loading" class="home-loading">Chargement...</div>
+  <div *ngIf="!loading && articles.length === 0" class="home-empty">Aucun article trouvé.</div>
+
+  <div *ngIf="!loading && articles.length > 0" class="home-articles-list">
+    <div *ngFor="let article of articles" class="article-card">
+      <img [src]="article.image" alt="image" *ngIf="article.image" />
+      <div class="article-content">
+        <div class="article-field">
+          <strong class="field-label">Titre :</strong>
+          <h4 class="article-title">{{ article.title }}</h4>
+        </div>
+        <div class="article-field">
+          <strong class="field-label">Contenu :</strong>
+          <p class="article-content-text">{{ article.content }}</p>
+        </div>
+        <div class="article-meta">
+          <span><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</span>
+          <span><strong>Tags :</strong> {{ article.tags.join(', ') }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="home-pagination">
+    <div class="pagination-info">
+      <span>Page {{ currentPage }} sur {{ totalPages }}</span>
+      <span>{{ totalArticles }} articles au total</span>
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === 1"
+        (click)="previousPage()">
+        <span class="material-icons">chevron_left</span>
+        Précédent
+      </button>
+      
+      <div class="pagination-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          class="pagination-number"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </div>
+      
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()">
+        Suivant
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</div>
