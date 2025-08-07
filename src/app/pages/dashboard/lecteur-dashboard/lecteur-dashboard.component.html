@@ -1,41 +1,138 @@
-<h2>Bienvenue Lecteur 📖</h2>
-
-<!-- 🔹 Bouton pour ouvrir la pop-up d’ajout -->
-<button (click)="showCreateModal = true" class="btn btn-success">➕ Ajouter un article</button>
-
-<!-- 🟢 POPUP CREATION ARTICLE -->
-<div class="modal" *ngIf="showCreateModal">
-  <div class="modal-content">
-    <h3>Créer un nouvel article</h3>
-    <form (ngSubmit)="addArticle()" #formRef="ngForm">
-      <input type="text" name="title" [(ngModel)]="newArticle.title" placeholder="Titre" required />
-      <br />
-      <textarea name="content" [(ngModel)]="newArticle.content" placeholder="Contenu" required></textarea>
-      <br />
-      <input type="text" name="image" [(ngModel)]="newArticle.image" placeholder="URL de l’image" />
-      <br />
-      <input type="text" name="tags" [(ngModel)]="newArticle.tags" placeholder="Tags (séparés par des virgules)" />
-      <br />
-      <button type="submit" [disabled]="formRef.invalid" class="btn btn-primary">Créer</button>
-      <button type="button" (click)="showCreateModal = false" class="btn btn-secondary">Annuler</button>
-    </form>
+<div class="lecteur-dashboard-bg">
+  <div class="lecteur-dashboard-header">
+    <span class="material-icons lecteur-dashboard-icon">menu_book</span>
+    <h2>Bienvenue Lecteur</h2>
+    <p class="lecteur-dashboard-intro">
+      Découvrez, lisez et partagez les meilleurs articles de la communauté !
+    </p>
   </div>
-</div>
 
-<hr />
+  <!-- Bouton pour ouvrir la pop-up d'ajout -->
+  <button (click)="showCreateModal = true" class="lecteur-btn-add">➕ Ajouter un article</button>
 
-<!-- 🔽 Liste des articles -->
-<h3>Liste des articles</h3>
+  <!-- Barre de recherche -->
+  <div class="lecteur-search-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <span class="material-icons search-icon">search</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (keyup.enter)="onSearch()"
+          placeholder="Rechercher dans les articles..." 
+          class="search-input" />
+        <button 
+          *ngIf="searchTerm" 
+          (click)="searchTerm = ''; onSearch()" 
+          class="clear-search-btn">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="tag-filter-group">
+        <span class="material-icons filter-icon">filter_list</span>
+        <select 
+          [(ngModel)]="selectedTag" 
+          (change)="onTagChange()" 
+          class="tag-select">
+          <option value="">Tous les tags</option>
+          <option *ngFor="let tag of availableTags" [value]="tag">{{ tag }}</option>
+        </select>
+      </div>
+      
+      <button 
+        *ngIf="searchTerm || selectedTag" 
+        (click)="clearSearch()" 
+        class="clear-all-btn">
+        <span class="material-icons">clear_all</span>
+        Effacer
+      </button>
+    </div>
+    
+    <div *ngIf="searchTerm || selectedTag" class="search-results-info">
+      <span *ngIf="searchTerm">Recherche : "{{ searchTerm }}"</span>
+      <span *ngIf="selectedTag">Tag : {{ selectedTag }}</span>
+      <span>• {{ totalArticles }} résultat(s)</span>
+    </div>
+  </div>
 
-<div *ngIf="loading">Chargement...</div>
-<div *ngIf="!loading && articles.length === 0">Aucun article trouvé.</div>
+  <!-- POPUP CREATION ARTICLE -->
+  <div class="lecteur-modal-bg" *ngIf="showCreateModal">
+    <div class="lecteur-modal">
+      <h3>Créer un nouvel article</h3>
+      <form (ngSubmit)="addArticle()" #formRef="ngForm">
+        <input type="text" name="title" [(ngModel)]="newArticle.title" placeholder="Titre" required />
+        <textarea name="content" [(ngModel)]="newArticle.content" placeholder="Contenu" required></textarea>
+        <input type="text" name="image" [(ngModel)]="newArticle.image" placeholder="URL de l’image" />
+        <input type="text" name="tags" [(ngModel)]="newArticle.tags" placeholder="Tags (séparés par des virgules)" />
+        <div class="lecteur-modal-actions">
+          <button type="submit" [disabled]="formRef.invalid" class="lecteur-btn-primary">Créer</button>
+          <button type="button" (click)="showCreateModal = false" class="lecteur-btn-secondary">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-<div *ngIf="!loading && articles.length > 0">
-  <div *ngFor="let article of articles" class="article-card">
-    <h4>{{ article.title }}</h4>
-    <img [src]="article.image" alt="image" width="150" />
-    <p>{{ article.content }}</p>
-    <p><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</p>
-    <p><strong>Tags :</strong> {{ article.tags.join(', ') }}</p>
+  <hr />
+
+  <h3 class="lecteur-section-title">Liste des articles</h3>
+
+  <div *ngIf="loading" class="lecteur-loading">Chargement...</div>
+  <div *ngIf="!loading && articles.length === 0" class="lecteur-empty">Aucun article trouvé.</div>
+
+  <div *ngIf="!loading && articles.length > 0" class="lecteur-articles-list">
+    <div *ngFor="let article of articles" class="lecteur-article-card">
+      <img [src]="article.image" alt="image" class="lecteur-article-img" *ngIf="article.image" />
+      <div class="lecteur-article-content">
+        <div class="article-field">
+          <strong class="field-label">Titre :</strong>
+          <h4 class="article-title">{{ article.title }}</h4>
+        </div>
+        <div class="article-field">
+          <strong class="field-label">Contenu :</strong>
+          <p class="article-content">{{ article.content }}</p>
+        </div>
+        <div class="lecteur-article-meta">
+          <span><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</span>
+          <span><strong>Tags :</strong> {{ article.tags.join(', ') }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="lecteur-pagination">
+    <div class="pagination-info">
+      <span>Page {{ currentPage }} sur {{ totalPages }}</span>
+      <span>{{ totalArticles }} articles au total</span>
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === 1"
+        (click)="previousPage()">
+        <span class="material-icons">chevron_left</span>
+        Précédent
+      </button>
+      
+      <div class="pagination-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          class="pagination-number"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </div>
+      
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()">
+        Suivant
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
   </div>
 </div>
