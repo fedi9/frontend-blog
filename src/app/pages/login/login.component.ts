@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           sessionStorage.setItem('token', response.token);
 
-          // 🔍 Debug : afficher le contenu du token dans la console
+      
           const payload = JSON.parse(atob(response.token.split('.')[1]));
           console.log('Contenu du token :', payload);
 
@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit {
           const role = payload.role.toLowerCase();
           console.log('Redirection vers:', `/dashboard/${role}`);
           
-          // Rediriger vers le dashboard approprié ou vers home pour les lecteurs
+          // Rediriger vers home pour les lecteurs
           if (role === 'lecteur') {
             this.router.navigate(['/home']);
           } else {
@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erreur de connexion', err);
-          // Optionnel : afficher un message d'erreur utilisateur
+         
         }
       });
     }

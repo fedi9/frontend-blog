@@ -13,23 +13,23 @@ export class AdminDashboardComponent implements OnInit {
   articles: Article[] = [];
   loading = true;
 
-  // Pagination properties
+  
   currentPage = 1;
   totalPages = 1;
   totalArticles = 0;
   articlesPerPage = 8;
 
-  // Search properties
+  
   searchTerm = '';
   selectedTag = '';
   availableTags: string[] = [];
 
-  // Popups
+ 
   showCreateModal = false;
   showEditModal = false;
   showDeleteModal = false;
 
-  // Nouvel article
+ 
   newArticle = {
     title: '',
     content: '',
@@ -37,7 +37,7 @@ export class AdminDashboardComponent implements OnInit {
     tags: ''
   };
 
-  // Edition
+ 
   selectedArticle: Article | null = null;
   editForm = {
     title: '',
@@ -46,23 +46,23 @@ export class AdminDashboardComponent implements OnInit {
     tags: ''
   };
 
-  // Utilisateurs
+
   users: User[] = [];
   usersLoading = true;
 
-  // Pagination utilisateurs
+
   userCurrentPage = 1;
   userTotalPages = 1;
   totalUsers = 0;
   usersPerPage = 8;
 
-  // Recherche utilisateurs
+ 
   userSearchTerm = '';
   selectedUserRole = '';
 
-  // Modals utilisateurs
+
   showEditUserModal = false;
-  // showDeleteUserModal = false;
+  
   selectedUser: User | null = null;
   newUserRole = '';
 
@@ -128,12 +128,12 @@ export class AdminDashboardComponent implements OnInit {
 
   // Search methods
   onSearch(): void {
-    this.currentPage = 1; // Retour à la première page lors d'une recherche
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
   onTagChange(): void {
-    this.currentPage = 1; // Retour à la première page lors d'un changement de tag
+    this.currentPage = 1;
     this.loadArticles();
   }
 
@@ -244,8 +244,8 @@ export class AdminDashboardComponent implements OnInit {
 
     this.articleService.createArticle(payload).subscribe({
       next: () => {
-        this.loadArticles(1); // Retour à la première page après création
-        this.loadAvailableTags(); // Recharger les tags disponibles
+        this.loadArticles(1); 
+        this.loadAvailableTags(); 
         this.showCreateModal = false;
         this.newArticle = { title: '', content: '', image: '', tags: '' };
       },
@@ -276,7 +276,7 @@ export class AdminDashboardComponent implements OnInit {
 
     this.articleService.updateArticle(this.selectedArticle._id, updated).subscribe({
       next: () => {
-        this.loadArticles(this.currentPage); // Garder la page actuelle après modification
+        this.loadArticles(this.currentPage); 
         this.showEditModal = false;
         this.selectedArticle = null;
       },
@@ -296,7 +296,7 @@ export class AdminDashboardComponent implements OnInit {
 
     this.articleService.deleteArticle(this.selectedArticle._id).subscribe({
       next: () => {
-        this.loadArticles(this.currentPage); // Garder la page actuelle après suppression
+        this.loadArticles(this.currentPage); 
         this.selectedArticle = null;
         this.showDeleteModal = false;
       },
@@ -309,25 +309,25 @@ export class AdminDashboardComponent implements OnInit {
   // User management methods
   openEditUserModal(user: User): void {
     this.selectedUser = user;
-    this.newUserRole = user.role; // Pré-remplir avec le rôle actuel
+    this.newUserRole = user.role; 
     this.showEditUserModal = true;
   }
 
   updateUserRole(): void {
     if (!this.selectedUser || !this.newUserRole) return;
 
-    const username = this.selectedUser.username; // Stocker le nom avant de le supprimer
+    const username = this.selectedUser.username; 
 
     this.userService.updateUserRole(this.selectedUser._id, this.newUserRole).subscribe({
       next: (response) => {
         console.log('Rôle modifié avec succès:', response.message);
-        // Recharger la liste des utilisateurs
+      
         this.loadUsers(this.userCurrentPage);
         this.showEditUserModal = false;
         this.selectedUser = null;
         this.newUserRole = '';
         
-        // Afficher un message de succès (vous pouvez ajouter un toast/notification)
+     
         alert(`Rôle de ${username} modifié avec succès !`);
       },
       error: (err) => {

@@ -15,18 +15,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   articles: Article[] = [];
   loading = true;
 
-  // Pagination properties
+ 
   currentPage = 1;
   totalPages = 1;
   totalArticles = 0;
   articlesPerPage = 8;
 
-  // Search properties
+ 
   searchTerm = '';
   selectedTag = '';
   availableTags: string[] = [];
 
-  // Notification properties
+  
   isSubscribed = false;
   isLoading = false;
   isSupported = false;
@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   notificationMessage = '';
   notificationMessageClass = '';
 
-  // Socket properties
+  
   private socketSubscription = new Subscription();
 
   constructor(
@@ -94,7 +94,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private getCurrentUserId(): string | null {
-    // Récupérer l'ID de l'utilisateur actuel depuis le localStorage ou sessionStorage
+    // Récupérer l'ID de l'utilisateur actuel depuis sessionStorage
     const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
     if (userStr) {
       try {
@@ -132,14 +132,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private joinArticleRooms(): void {
-    // Rejoindre les rooms Socket.io pour chaque article
+    
     this.articles.forEach(article => {
       this.socketService.joinArticle(article._id);
     });
   }
 
   loadAvailableTags(): void {
-    // Charger tous les articles pour extraire les tags uniques
+  
     this.articleService.getAllArticles(1, 1000).subscribe({
       next: (data: PaginatedResponse) => {
         const allTags = data.articles.flatMap(article => article.tags);
@@ -151,7 +151,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Charger le statut de like pour tous les articles
+
   private loadLikeStatusForArticles(): void {
     this.articles.forEach(article => {
       this.articleService.checkUserLike(article._id).subscribe({
@@ -161,7 +161,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erreur lors du chargement du statut de like:', error);
-          // En cas d'erreur, initialiser avec des valeurs par défaut
+        
           article.userLiked = false;
           article.likeCount = article.likeCount || 0;
         }
@@ -171,12 +171,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Search methods
   onSearch(): void {
-    this.currentPage = 1; // Retour à la première page lors d'une recherche
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
   onTagChange(): void {
-    this.currentPage = 1; // Retour à la première page lors d'un changement de tag
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
@@ -351,7 +351,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const article = this.articles.find(a => a._id === articleId);
     if (!article) return;
 
-    // Marquer l'article comme en cours de like
+    
     article.liking = true;
 
     // Faire l'action de like/unlike directement

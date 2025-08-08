@@ -12,13 +12,13 @@ export class RedacteurDashboardComponent {
   articles: Article[] = [];
   loading = true;
 
-  // Pagination properties
+
   currentPage = 1;
   totalPages = 1;
   totalArticles = 0;
-  articlesPerPage = 8; // 8 articles par page
+  articlesPerPage = 8; 
 
-  // Search properties
+ 
   searchTerm = '';
   selectedTag = '';
   availableTags: string[] = [];
@@ -83,12 +83,12 @@ export class RedacteurDashboardComponent {
 
   // Search methods
   onSearch(): void {
-    this.currentPage = 1; // Retour à la première page lors d'une recherche
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
   onTagChange(): void {
-    this.currentPage = 1; // Retour à la première page lors d'un changement de tag
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
@@ -100,7 +100,7 @@ export class RedacteurDashboardComponent {
   }
 
   loadAvailableTags(): void {
-    // Charger tous les articles pour extraire les tags uniques
+    
     this.articleService.getAllArticles(1, 1000).subscribe({
       next: (data: PaginatedResponse) => {
         const allTags = data.articles.flatMap(article => article.tags);
@@ -112,7 +112,7 @@ export class RedacteurDashboardComponent {
     });
   }
 
-  // Pagination methods
+
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.loadArticles(page);
@@ -157,8 +157,8 @@ export class RedacteurDashboardComponent {
 
     this.articleService.createArticle(payload).subscribe({
       next: () => {
-        this.loadArticles(1); // Retour à la première page après création
-        this.loadAvailableTags(); // Recharger les tags disponibles
+        this.loadArticles(1); 
+        this.loadAvailableTags(); 
         this.showCreateModal = false;
         this.newArticle = { title: '', content: '', image: '', tags: '' };
       },
@@ -191,7 +191,7 @@ export class RedacteurDashboardComponent {
 
     this.articleService.updateArticle(this.selectedArticleId, updated).subscribe({
       next: () => {
-        this.loadArticles(this.currentPage); // Garder la page actuelle après modification
+        this.loadArticles(this.currentPage); 
         this.showEditModal = false;
       },
       error: (err) => {

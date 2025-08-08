@@ -59,12 +59,12 @@ export class LecteurDashboardComponent {
 
   // Search methods
   onSearch(): void {
-    this.currentPage = 1; // Retour à la première page lors d'une recherche
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
   onTagChange(): void {
-    this.currentPage = 1; // Retour à la première page lors d'un changement de tag
+    this.currentPage = 1; 
     this.loadArticles();
   }
 
@@ -76,7 +76,7 @@ export class LecteurDashboardComponent {
   }
 
   loadAvailableTags(): void {
-    // Charger tous les articles pour extraire les tags uniques
+    
     this.articleService.getAllArticles(1, 1000).subscribe({
       next: (data: PaginatedResponse) => {
         const allTags = data.articles.flatMap(article => article.tags);
@@ -133,8 +133,8 @@ export class LecteurDashboardComponent {
   
     this.articleService.createArticle(payload).subscribe({
       next: () => {
-        this.loadArticles(1); // Retour à la première page après création
-        this.loadAvailableTags(); // Recharger les tags disponibles
+        this.loadArticles(1); 
+        this.loadAvailableTags(); 
         this.newArticle = { title: '', content: '', image: '', tags: '' };
         this.showCreateModal = false;
       },
