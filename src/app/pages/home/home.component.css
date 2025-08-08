@@ -261,10 +261,58 @@
 
 .article-meta {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  color: #7f53ac;
-  font-size: 0.97rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.article-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  min-width: fit-content;
+  width: auto;
+}
+
+.like-btn:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.like-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.like-btn.liked {
+  background: #10b981;
+}
+
+.like-btn.liked:hover:not(:disabled) {
+  background: #059669;
+}
+
+.like-btn .material-icons {
+  font-size: 1rem;
 }
 
 /* Pagination Styles */

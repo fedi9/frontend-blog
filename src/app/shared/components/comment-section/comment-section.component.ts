@@ -20,6 +20,8 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
   currentPage = 1;
   totalPages = 1;
   totalComments = 0;
+  private _showComments = false; // Propriété privée pour l'état
+  showCommentForm = false; // Nouvelle propriété pour le formulaire
   
   commentForm: FormGroup;
   replyForm: FormGroup;
@@ -27,6 +29,16 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
   
   private subscriptions = new Subscription();
   currentUser: User | null = null;
+
+  // Getter pour showComments
+  get showComments(): boolean {
+    return this._showComments;
+  }
+
+  // Setter pour showComments
+  set showComments(value: boolean) {
+    this._showComments = value;
+  }
 
   constructor(
     private commentService: CommentService,
@@ -181,6 +193,9 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
       // Ajouter le commentaire temporaire immédiatement
       this.comments.unshift(tempComment);
       
+      // Ouvrir automatiquement les commentaires après l'ajout
+      this.showComments = true;
+      
       if (this.socketService.isSocketConnected()) {
         // Utiliser Socket.io pour la création en temps réel
         this.socketService.createComment(this.articleId, content);
@@ -246,6 +261,9 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
       }
       this.replyingTo.replies.unshift(tempReply);
       
+      // Ouvrir automatiquement les commentaires après l'ajout
+      this.showComments = true;
+      
       if (this.socketService.isSocketConnected()) {
         // Utiliser Socket.io pour la création en temps réel
         this.socketService.createComment(this.articleId, content, this.replyingTo._id);
@@ -262,11 +280,10 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
           }).subscribe({
             next: (response) => {
               // Remplacer la réponse temporaire par la vraie réponse
-              const parentComment = this.comments.find(c => c._id === this.replyingTo?._id);
-              if (parentComment && parentComment.replies) {
-                const tempIndex = parentComment.replies.findIndex(r => r._id === tempReply._id);
+              if (this.replyingTo && this.replyingTo.replies) {
+                const tempIndex = this.replyingTo.replies.findIndex(r => r._id === tempReply._id);
                 if (tempIndex !== -1) {
-                  parentComment.replies[tempIndex] = response.comment;
+                  this.replyingTo.replies[tempIndex] = response.comment;
                 }
               }
               this.replyForm.reset();
@@ -276,13 +293,13 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
             error: (error) => {
               console.error('Error creating reply:', error);
               // Retirer la réponse temporaire en cas d'erreur
-              const parentComment = this.comments.find(c => c._id === this.replyingTo?._id);
-              if (parentComment && parentComment.replies) {
-                const tempIndex = parentComment.replies.findIndex(r => r._id === tempReply._id);
+              if (this.replyingTo && this.replyingTo.replies) {
+                const tempIndex = this.replyingTo.replies.findIndex(r => r._id === tempReply._id);
                 if (tempIndex !== -1) {
-                  parentComment.replies.splice(tempIndex, 1);
+                  this.replyingTo.replies.splice(tempIndex, 1);
                 }
               }
+              this.replyingTo = null;
               this.submitting = false;
             }
           })
@@ -332,12 +349,24 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
   }
 
   formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const dateObj = new Date(date);
+    const now = new Date();
+    const diff = now.getTime() - dateObj.getTime();
+    
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'À l\'instant';
+    if (minutes < 60) return `Il y a ${minutes} min`;
+    if (hours < 24) return `Il y a ${hours}h`;
+    if (days < 7) return `Il y a ${days}j`;
+    
+    return dateObj.toLocaleDateString();
+  }
+
+  // Méthode pour basculer l'affichage des commentaires
+  toggleComments(): void {
+    this.showComments = !this.showComments;
   }
 } 

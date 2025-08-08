@@ -53,6 +53,9 @@ export class HomeComponent implements OnInit {
         this.totalPages = data.totalPages;
         this.totalArticles = data.total;
         this.loading = false;
+        
+        // Charger le statut de like pour chaque article
+        this.loadLikeStatusForArticles();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des articles :', err);
@@ -71,6 +74,24 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         console.error('Erreur lors du chargement des tags:', err);
       }
+    });
+  }
+
+  // Charger le statut de like pour tous les articles
+  private loadLikeStatusForArticles(): void {
+    this.articles.forEach(article => {
+      this.articleService.checkUserLike(article._id).subscribe({
+        next: (likeStatus) => {
+          article.userLiked = likeStatus.userLiked;
+          article.likeCount = likeStatus.likeCount;
+        },
+        error: (error) => {
+          console.error('Erreur lors du chargement du statut de like:', error);
+          // En cas d'erreur, initialiser avec des valeurs par défaut
+          article.userLiked = false;
+          article.likeCount = article.likeCount || 0;
+        }
+      });
     });
   }
 
@@ -249,6 +270,30 @@ export class HomeComponent implements OnInit {
       case 'denied': return 'text-danger';
       default: return 'text-warning';
     }
+  }
+
+  // Méthode pour liker/unliker un article
+  likeArticle(articleId: string): void {
+    const article = this.articles.find(a => a._id === articleId);
+    if (!article) return;
+
+    // Marquer l'article comme en cours de like
+    article.liking = true;
+
+    // Faire l'action de like/unlike directement
+    this.articleService.likeArticle(articleId).subscribe({
+      next: (response) => {
+        // Mettre à jour le compteur de likes et l'état de l'utilisateur
+        article.likeCount = response.likeCount;
+        article.userLiked = response.userLiked;
+        article.liking = false;
+        console.log('Article like/unlike avec succès:', response);
+      },
+      error: (error) => {
+        console.error('Erreur lors du like/unlike:', error);
+        article.liking = false;
+      }
+    });
   }
 
   private showNotificationMessage(text: string, type: 'success' | 'danger' | 'info'): void {

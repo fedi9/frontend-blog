@@ -136,6 +136,19 @@
         <div class="article-meta">
           <span><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</span>
           <span><strong>Tags :</strong> {{ article.tags.join(', ') }}</span>
+          <span><strong>Likes :</strong> {{ article.likeCount || 0 }}</span>
+        </div>
+        
+        <!-- Bouton de like -->
+        <div class="article-actions">
+          <button 
+            class="like-btn" 
+            [class.liked]="article.userLiked"
+            (click)="likeArticle(article._id)"
+            [disabled]="article.liking">
+            <span class="material-icons">{{ article.userLiked ? 'thumb_up' : 'thumb_up_outlined' }}</span>
+            {{ article.liking ? 'Chargement...' : (article.userLiked ? 'J\'aime pas' : 'J\'aime') }}
+          </button>
         </div>
       </div>
       

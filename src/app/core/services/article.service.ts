@@ -17,6 +17,11 @@ export interface SearchParams {
   limit?: number;
 }
 
+export interface LikeStatus {
+  userLiked: boolean;
+  likeCount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -50,5 +55,13 @@ export class ArticleService {
 
   deleteArticle(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  likeArticle(articleId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${articleId}/like`, {});
+  }
+
+  checkUserLike(articleId: string): Observable<LikeStatus> {
+    return this.http.get<LikeStatus>(`${this.apiUrl}/${articleId}/like`);
   }
 }

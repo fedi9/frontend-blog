@@ -1,7 +1,6 @@
 <div class="comment-section">
   <!-- Formulaire de commentaire principal -->
   <div class="comment-form" *ngIf="currentUser">
-    <h4>Ajouter un commentaire</h4>
     <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
       <div class="form-group">
         <textarea 
@@ -30,9 +29,20 @@
     <p>Vous devez être connecté pour commenter.</p>
   </div>
 
-  <!-- Liste des commentaires -->
-  <div class="comments-list" *ngIf="!loading">
-    <h4>Commentaires ({{ totalComments }})</h4>
+  <!-- En-tête des commentaires avec toggle -->
+  <div class="comments-header" *ngIf="!loading">
+    <button 
+      class="btn btn-link comments-toggle" 
+      (click)="toggleComments()"
+      *ngIf="totalComments > 0">
+      <span class="comments-count">Commentaires ({{ totalComments }})</span>
+      <i class="fas" [class.fa-chevron-down]="!showComments" [class.fa-chevron-up]="showComments"></i>
+    </button>
+    <span class="comments-count" *ngIf="totalComments === 0">Aucun commentaire</span>
+  </div>
+
+  <!-- Liste des commentaires (affichée seulement si showComments est true) -->
+  <div class="comments-list" *ngIf="!loading && showComments && totalComments > 0">
     
     <div class="comment-item" *ngFor="let comment of comments">
       <div class="comment-header">
@@ -132,11 +142,6 @@
         <span *ngIf="loading">Chargement...</span>
         <span *ngIf="!loading">Charger plus de commentaires</span>
       </button>
-    </div>
-
-    <!-- Aucun commentaire -->
-    <div class="no-comments" *ngIf="comments.length === 0">
-      <p>Aucun commentaire pour le moment. Soyez le premier à commenter !</p>
     </div>
   </div>
 
