@@ -100,6 +100,8 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
                 parentComment.replies[tempIndex] = event.comment;
               } else {
                 parentComment.replies.unshift(event.comment);
+                // Mettre à jour le nombre total de commentaires pour les réponses
+                this.totalComments++;
               }
             }
           } else {
@@ -109,6 +111,8 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
               this.comments[tempIndex] = event.comment;
             } else {
               this.comments.unshift(event.comment);
+              // Mettre à jour le nombre total de commentaires
+              this.totalComments++;
             }
           }
         } else {
@@ -193,6 +197,9 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
       // Ajouter le commentaire temporaire immédiatement
       this.comments.unshift(tempComment);
       
+      // Mettre à jour le nombre total de commentaires immédiatement
+      this.totalComments++;
+      
       // Ouvrir automatiquement les commentaires après l'ajout
       this.showComments = true;
       
@@ -223,6 +230,8 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
               const tempIndex = this.comments.findIndex(c => c._id === tempComment._id);
               if (tempIndex !== -1) {
                 this.comments.splice(tempIndex, 1);
+                // Remettre à jour le nombre total de commentaires
+                this.totalComments--;
               }
               this.submitting = false;
             }
@@ -261,6 +270,9 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
       }
       this.replyingTo.replies.unshift(tempReply);
       
+      // Mettre à jour le nombre total de commentaires immédiatement
+      this.totalComments++;
+      
       // Ouvrir automatiquement les commentaires après l'ajout
       this.showComments = true;
       
@@ -297,6 +309,8 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
                 const tempIndex = this.replyingTo.replies.findIndex(r => r._id === tempReply._id);
                 if (tempIndex !== -1) {
                   this.replyingTo.replies.splice(tempIndex, 1);
+                  // Remettre à jour le nombre total de commentaires
+                  this.totalComments--;
                 }
               }
               this.replyingTo = null;
