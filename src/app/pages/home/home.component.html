@@ -7,6 +7,70 @@
     </p>
   </div>
 
+  <!-- Test des notifications push -->
+  <div class="notifications-test-section" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+    <h3 style="color: #007bff; margin-bottom: 15px;">
+      <i class="fas fa-bell"></i>
+      🔔 Test des Notifications Push
+    </h3>
+    <div class="notification-test-container" style="padding: 20px; background: white; border-radius: 8px;">
+      <h4>🔔 Test des Notifications Push</h4>
+      
+      <!-- Support -->
+      <div class="status-section" style="margin-bottom: 15px;">
+        <strong>Support :</strong>
+        <span [class]="isSupported ? 'text-success' : 'text-danger'">
+          {{ isSupported ? '✅ Supporté' : '❌ Non supporté' }}
+        </span>
+      </div>
+
+      <!-- Permissions -->
+      <div class="status-section" style="margin-bottom: 15px;">
+        <strong>Permissions :</strong>
+        <span [class]="getPermissionClass()">
+          {{ getPermissionText() }}
+        </span>
+      </div>
+
+      <!-- Abonnement -->
+      <div class="status-section" style="margin-bottom: 20px;">
+        <strong>Abonnement :</strong>
+        <span [class]="isSubscribed ? 'text-success' : 'text-warning'">
+          {{ isSubscribed ? '✅ Abonné' : '❌ Non abonné' }}
+        </span>
+      </div>
+
+      <!-- Boutons -->
+      <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button 
+          class="btn btn-primary" 
+          (click)="subscribeToNotifications()"
+          [disabled]="!isSupported || isLoading">
+          {{ isLoading ? 'Chargement...' : 'S\'abonner' }}
+        </button>
+        
+        <button 
+          class="btn btn-secondary" 
+          (click)="unsubscribeFromNotifications()"
+          [disabled]="!isSupported || !isSubscribed || isLoading">
+          Se désabonner
+        </button>
+        
+        <button 
+          class="btn btn-info" 
+          (click)="testNotification()"
+          [disabled]="!isSupported">
+          Test Notification
+        </button>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="notificationMessage" class="alert" [class]="notificationMessageClass" style="margin-top: 15px;">
+        {{ notificationMessage }}
+      </div>
+    </div>
+  </div>
+
   <!-- Barre de recherche -->
   <div class="home-search-section">
     <div class="search-container">
@@ -75,6 +139,11 @@
           <span><strong>Auteur :</strong> {{ article.authorDetails?.username || 'Anonyme' }}</span>
           <span><strong>Tags :</strong> {{ article.tags.join(', ') }}</span>
         </div>
+      </div>
+      
+      <!-- Section de commentaires -->
+      <div class="article-comments">
+        <app-comment-section [articleId]="article._id"></app-comment-section>
       </div>
     </div>
   </div>

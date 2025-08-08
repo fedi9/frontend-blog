@@ -1,0 +1,107 @@
+<div class="notification-settings">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-bell"></i>
+        Paramètres de notifications
+      </h5>
+    </div>
+    
+    <div class="card-body">
+      <!-- Statut de support -->
+      <div class="status-section mb-3">
+        <h6>Support du navigateur</h6>
+        <div class="d-flex align-items-center">
+          <span class="badge" [ngClass]="isSupported ? 'bg-success' : 'bg-danger'">
+            {{ isSupported ? 'Supporté' : 'Non supporté' }}
+          </span>
+          <small class="text-muted ms-2">
+            {{ isSupported ? 'Votre navigateur supporte les notifications push' : 'Votre navigateur ne supporte pas les notifications push' }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Statut des permissions -->
+      <div class="status-section mb-3">
+        <h6>Permissions</h6>
+        <div class="d-flex align-items-center">
+          <span class="badge" [ngClass]="getStatusClass()">
+            {{ getStatusText() }}
+          </span>
+          <small class="text-muted ms-2">
+            {{ getPermissionDescription() }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-section" *ngIf="isSupported">
+        <!-- S'abonner -->
+        <div class="mb-3" *ngIf="!isSubscribed">
+          <button 
+            class="btn btn-primary" 
+            (click)="subscribeToNotifications()"
+            [disabled]="isLoading">
+            <i class="fas fa-bell" *ngIf="!isLoading"></i>
+            <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoading"></span>
+            {{ isLoading ? 'Abonnement...' : 'S\'abonner aux notifications' }}
+          </button>
+          <small class="form-text text-muted d-block mt-1">
+            Recevez des notifications en temps réel quand quelqu'un commente vos articles.
+          </small>
+        </div>
+
+        <!-- Se désabonner -->
+        <div class="mb-3" *ngIf="isSubscribed">
+          <button 
+            class="btn btn-outline-danger" 
+            (click)="unsubscribeFromNotifications()"
+            [disabled]="isLoading">
+            <i class="fas fa-bell-slash" *ngIf="!isLoading"></i>
+            <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoading"></span>
+            {{ isLoading ? 'Désabonnement...' : 'Se désabonner' }}
+          </button>
+          <small class="form-text text-muted d-block mt-1">
+            Vous êtes actuellement abonné aux notifications push.
+          </small>
+        </div>
+
+        <!-- Tester la notification -->
+        <div class="mb-3" *ngIf="isSubscribed">
+          <button 
+            class="btn btn-outline-info" 
+            (click)="testNotification()"
+            [disabled]="isLoading">
+            <i class="fas fa-paper-plane" *ngIf="!isLoading"></i>
+            <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoading"></span>
+            {{ isLoading ? 'Envoi...' : 'Tester une notification' }}
+          </button>
+          <small class="form-text text-muted d-block mt-1">
+            Envoyer une notification de test pour vérifier que tout fonctionne.
+          </small>
+        </div>
+      </div>
+
+      <!-- Message si non supporté -->
+      <div class="alert alert-warning" *ngIf="!isSupported">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Notifications non supportées</strong>
+        <p class="mb-0 mt-1">
+          Votre navigateur ne supporte pas les notifications push. 
+          Veuillez utiliser un navigateur moderne comme Chrome, Firefox, ou Edge.
+        </p>
+      </div>
+
+      <!-- Informations -->
+      <div class="info-section mt-4">
+        <h6>À propos des notifications</h6>
+        <ul class="list-unstyled">
+          <li><i class="fas fa-check text-success me-2"></i>Notifications en temps réel</li>
+          <li><i class="fas fa-check text-success me-2"></i>Commentaires sur vos articles</li>
+          <li><i class="fas fa-check text-success me-2"></i>Respect de la vie privée</li>
+          <li><i class="fas fa-check text-success me-2"></i>Désabonnement facile</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

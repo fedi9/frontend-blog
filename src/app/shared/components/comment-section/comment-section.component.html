@@ -1,0 +1,150 @@
+<div class="comment-section">
+  <!-- Formulaire de commentaire principal -->
+  <div class="comment-form" *ngIf="currentUser">
+    <h4>Ajouter un commentaire</h4>
+    <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
+      <div class="form-group">
+        <textarea 
+          formControlName="content" 
+          class="form-control" 
+          rows="3" 
+          placeholder="Écrivez votre commentaire..."
+          [disabled]="submitting">
+        </textarea>
+        <div class="invalid-feedback" *ngIf="commentForm.get('content')?.invalid && commentForm.get('content')?.touched">
+          Le contenu est requis.
+        </div>
+      </div>
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="commentForm.invalid || submitting">
+        <span *ngIf="submitting">Envoi...</span>
+        <span *ngIf="!submitting">Commenter</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Message si non connecté -->
+  <div class="login-required" *ngIf="!currentUser">
+    <p>Vous devez être connecté pour commenter.</p>
+  </div>
+
+  <!-- Liste des commentaires -->
+  <div class="comments-list" *ngIf="!loading">
+    <h4>Commentaires ({{ totalComments }})</h4>
+    
+    <div class="comment-item" *ngFor="let comment of comments">
+      <div class="comment-header">
+        <div class="comment-author">
+          <strong>{{ comment.authorName || 'Utilisateur' }}</strong>
+          <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+          <span class="edited-badge" *ngIf="comment.isEdited">(modifié)</span>
+        </div>
+        <div class="comment-actions" *ngIf="currentUser">
+          <button 
+            class="btn btn-sm btn-outline-primary" 
+            (click)="startReply(comment)"
+            *ngIf="!replyingTo || replyingTo._id !== comment._id">
+            Répondre
+          </button>
+        </div>
+      </div>
+      
+      <div class="comment-content">
+        {{ comment.content }}
+      </div>
+      
+      <div class="comment-footer">
+        <button 
+          class="btn btn-sm btn-outline-secondary" 
+          (click)="toggleLike(comment)"
+          [class.liked]="isLikedByUser(comment)">
+          <i class="fas fa-heart"></i>
+          {{ comment.likes?.length || 0 }}
+        </button>
+      </div>
+
+      <!-- Formulaire de réponse -->
+      <div class="reply-form" *ngIf="replyingTo && replyingTo._id === comment._id">
+        <form [formGroup]="replyForm" (ngSubmit)="onSubmitReply()">
+          <div class="form-group">
+            <textarea 
+              formControlName="content" 
+              class="form-control" 
+              rows="2" 
+              placeholder="Écrivez votre réponse..."
+              [disabled]="submitting">
+            </textarea>
+          </div>
+          <div class="reply-actions">
+            <button 
+              type="submit" 
+              class="btn btn-sm btn-primary" 
+              [disabled]="replyForm.invalid || submitting">
+              <span *ngIf="submitting">Envoi...</span>
+              <span *ngIf="!submitting">Répondre</span>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-sm btn-secondary" 
+              (click)="cancelReply()">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Réponses -->
+      <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
+        <div class="reply-item" *ngFor="let reply of comment.replies">
+          <div class="reply-header">
+            <div class="reply-author">
+              <strong>{{ reply.authorName || 'Utilisateur' }}</strong>
+              <span class="reply-date">{{ formatDate(reply.createdAt) }}</span>
+              <span class="edited-badge" *ngIf="reply.isEdited">(modifié)</span>
+            </div>
+          </div>
+          
+          <div class="reply-content">
+            {{ reply.content }}
+          </div>
+          
+          <div class="reply-footer">
+            <button 
+              class="btn btn-sm btn-outline-secondary" 
+              (click)="toggleLike(reply)"
+              [class.liked]="isLikedByUser(reply)">
+              <i class="fas fa-heart"></i>
+              {{ reply.likes?.length || 0 }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charger plus de commentaires -->
+    <div class="load-more" *ngIf="currentPage < totalPages">
+      <button 
+        class="btn btn-outline-primary" 
+        (click)="loadMoreComments()"
+        [disabled]="loading">
+        <span *ngIf="loading">Chargement...</span>
+        <span *ngIf="!loading">Charger plus de commentaires</span>
+      </button>
+    </div>
+
+    <!-- Aucun commentaire -->
+    <div class="no-comments" *ngIf="comments.length === 0">
+      <p>Aucun commentaire pour le moment. Soyez le premier à commenter !</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p>Chargement des commentaires...</p>
+  </div>
+</div> 

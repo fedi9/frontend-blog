@@ -17,6 +17,7 @@ import {AdminDashboardComponent} from './pages/dashboard/admin-dashboard/admin-d
 import {EditorDashboardComponent} from './pages/dashboard/editor-dashboard/editor-dashboard.component';
 import {LecteurDashboardComponent} from './pages/dashboard/lecteur-dashboard/lecteur-dashboard.component';
 import {RedacteurDashboardComponent} from './pages/dashboard/redacteur-dashboard/redacteur-dashboard.component';
+import { CommentSectionComponent } from './shared/components/comment-section/comment-section.component';
 
 
 import { ReactiveFormsModule } from '@angular/forms';
@@ -33,7 +34,8 @@ import { FormsModule } from '@angular/forms';
     AdminDashboardComponent,
     EditorDashboardComponent,
     LecteurDashboardComponent,
-    RedacteurDashboardComponent
+    RedacteurDashboardComponent,
+    CommentSectionComponent
     
   ],
   imports: [

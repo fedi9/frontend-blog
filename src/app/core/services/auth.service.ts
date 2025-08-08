@@ -2,6 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -32,6 +39,23 @@ export class AuthService {
     }
   }
 
+  getCurrentUser(): User | null {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return {
+        id: payload.id || payload.userId,
+        username: payload.username,
+        email: payload.email,
+        role: payload.role
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }
@@ -41,13 +65,6 @@ export class AuthService {
   }
 
   login(credentials: { email: string; password: string }): Observable<any> {
-  return this.http.post(`${this.apiUrl}/login`, credentials);
-}
-
-
-
-
-  
-
-  // Tu pourras ajouter login ici plus tard
+    return this.http.post(`${this.apiUrl}/login`, credentials);
+  }
 }
