@@ -23,8 +23,11 @@ export class AuthService {
   }
 
   logout(): void {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('role');
+    // Nettoyer toutes les données de session
+    sessionStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('user');
   }
 
   getUserRole(): string | null {

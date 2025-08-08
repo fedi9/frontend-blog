@@ -1,5 +1,13 @@
 <h2>Connexion</h2>
 
+<!-- Message d'expiration de session -->
+<div *ngIf="sessionExpiredMessage" class="session-expired-message">
+  <div class="alert alert-warning">
+    <strong>⚠️ Session expirée</strong><br>
+    {{ sessionExpiredMessage }}
+  </div>
+</div>
+
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <label>Email</label>
   <input type="email" formControlName="email" />

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Comment } from '../models/comment.model';
+import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 
 export interface CommentEvent {
   comment: Comment;
@@ -45,7 +47,10 @@ export class SocketService {
   public connectionStatus$ = this.connectionStatusSubject.asObservable();
   public articleLiked$ = this.articleLikedSubject.asObservable();
 
-  constructor() {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   // Connecter au serveur Socket.io
   connect(token: string): void {
@@ -83,6 +88,20 @@ export class SocketService {
       console.error('❌ Erreur de connexion Socket.io:', error);
       this.isConnected = false;
       this.connectionStatusSubject.next(false);
+      
+      // Vérifier si c'est une erreur d'authentification
+      if (error.message && error.message.includes('Authentication error')) {
+        console.log('🔐 Erreur d\'authentification Socket.io, redirection vers la page de login...');
+        // Nettoyer les données de session
+        this.authService.logout();
+        // Rediriger vers la page de login avec un message
+        this.router.navigate(['/login'], { 
+          queryParams: { 
+            message: 'Votre session a expiré. Veuillez vous reconnecter.' 
+          } 
+        });
+        return;
+      }
       
       // Tentative de reconnexion
       this.reconnectAttempts++;

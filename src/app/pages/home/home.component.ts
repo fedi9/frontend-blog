@@ -70,6 +70,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // Écouter les erreurs de connexion Socket.io
+    this.socketSubscription.add(
+      this.socketService.connectionStatus$.subscribe((isConnected: boolean) => {
+        if (!isConnected) {
+          console.log('🔌 Socket.io déconnecté');
+        }
+      })
+    );
   }
 
   private updateArticleLike(event: ArticleLikeEvent): void {
