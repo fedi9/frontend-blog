@@ -274,18 +274,27 @@
 }
 
 .chart-wrapper {
-  background: #f8f9fa;
+  position: relative;
+  height: 400px;
+  width: 100%;
+  margin: 20px 0;
+  background: white;
   border-radius: 8px;
   padding: 20px;
-  border: 1px solid #e9ecef;
-  position: relative;
-  min-height: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .chart-wrapper canvas {
-  max-height: 400px;
+  max-height: 100% !important;
+  max-width: 100% !important;
   width: 100% !important;
   height: 100% !important;
+  /* Optimisations pour éviter les vibrations */
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 @media (max-width: 768px) {

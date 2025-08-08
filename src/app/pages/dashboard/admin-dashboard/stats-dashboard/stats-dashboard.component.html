@@ -43,7 +43,7 @@
     <div class="stats-section">
       <h2>🏆 Articles les Plus Likés</h2>
       <div class="top-articles">
-        <div *ngFor="let item of globalStats.topLikedArticles || []; let i = index" class="article-card">
+        <div *ngFor="let item of globalStats.topLikedArticles || []; let i = index; trackBy: trackByArticle" class="article-card">
           <div class="rank">{{ i + 1 }}</div>
           <div class="article-info">
             <h4>{{ item.article?.title || 'Titre non disponible' }}</h4>
@@ -62,7 +62,7 @@
     <div class="stats-section">
       <h2>📅 Évolution des Likes ({{ selectedPeriod }})</h2>
       <div class="period-stats">
-        <div *ngFor="let stat of globalStats.periodStats || []" class="period-stat">
+        <div *ngFor="let stat of globalStats.periodStats || []; trackBy: trackByPeriodStat" class="period-stat">
           <div class="period-date">
             <span *ngIf="stat.date">{{ formatDate(stat.date) }}</span>
             <span *ngIf="!stat.date">{{ stat.date || 'Date non disponible' }}</span>
