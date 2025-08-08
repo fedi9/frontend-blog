@@ -50,7 +50,7 @@ export class CommentSectionComponent implements OnInit, OnDestroy {
     
     // Connecter au Socket.io si l'utilisateur est connecté
     if (this.currentUser) {
-      const token = localStorage.getItem('token');
+              const token = sessionStorage.getItem('token');
       if (token) {
         this.socketService.connect(token);
         this.socketService.joinArticle(this.articleId);

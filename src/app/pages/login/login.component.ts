@@ -49,13 +49,13 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
-          localStorage.setItem('token', response.token);
+          sessionStorage.setItem('token', response.token);
 
           // 🔍 Debug : afficher le contenu du token dans la console
           const payload = JSON.parse(atob(response.token.split('.')[1]));
           console.log('Contenu du token :', payload); // <-- Cette ligne t'aidera à déboguer
 
-          localStorage.setItem('role', payload.role);
+          sessionStorage.setItem('role', payload.role);
 
           // Redirection selon rôle
           const role = payload.role.toLowerCase();

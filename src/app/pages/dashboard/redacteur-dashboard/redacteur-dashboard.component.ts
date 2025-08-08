@@ -70,7 +70,7 @@ export class RedacteurDashboardComponent {
   }
 
   loadCurrentUser(): void {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return;
 
     try {

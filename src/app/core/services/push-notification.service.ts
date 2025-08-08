@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from, of, throwError, firstValueFrom } from 'rxjs';
+import { Observable, from, of, throwError, firstValueFrom, timeout } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 
 export interface PushSubscriptionData {
@@ -73,8 +73,11 @@ export class PushNotificationService {
    */
   async subscribeToPushNotifications(): Promise<PushSubscriptionData | null> {
     try {
+      console.log('🔔 Début de l\'abonnement aux notifications push...');
+      
       // Vérifier si le Service Worker est initialisé
       if (!this.swRegistration) {
+        console.log('🔧 Initialisation du Service Worker...');
         const initialized = await this.initialize();
         if (!initialized) {
           throw new Error('Service Worker non initialisé');
@@ -82,13 +85,18 @@ export class PushNotificationService {
       }
 
       // Demander la permission
+      console.log('🔐 Demande de permission...');
       const permission = await this.requestPermission();
       if (permission !== 'granted') {
         throw new Error('Permission de notification refusée');
       }
 
-      // Obtenir la clé VAPID publique
-      const vapidPublicKey = await firstValueFrom(this.getVapidPublicKey());
+      // Obtenir la clé VAPID publique avec timeout
+      console.log('🔑 Récupération de la clé VAPID...');
+      const vapidPublicKey = await firstValueFrom(this.getVapidPublicKey().pipe(
+        timeout(5000) // Timeout de 5 secondes
+      ));
+      
       if (!vapidPublicKey) {
         throw new Error('Impossible de récupérer la clé VAPID');
       }
@@ -97,6 +105,7 @@ export class PushNotificationService {
       const convertedVapidKey = this.urlBase64ToUint8Array(vapidPublicKey);
 
       // S'abonner aux notifications push
+      console.log('📝 Création de l\'abonnement...');
       const subscription = await this.swRegistration!.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey
@@ -104,8 +113,13 @@ export class PushNotificationService {
 
       console.log('✅ Abonnement push créé:', subscription);
 
-      // Envoyer l'abonnement au serveur
-      await firstValueFrom(this.sendSubscriptionToServer(subscription));
+      // Envoyer l'abonnement au serveur avec timeout
+      console.log('📡 Envoi de l\'abonnement au serveur...');
+      await firstValueFrom(this.sendSubscriptionToServer(subscription).pipe(
+        timeout(5000) // Timeout de 5 secondes
+      ));
+
+      console.log('✅ Abonnement terminé avec succès');
 
       return {
         endpoint: subscription.endpoint,
@@ -117,7 +131,7 @@ export class PushNotificationService {
 
     } catch (error) {
       console.error('❌ Erreur lors de l\'abonnement aux notifications:', error);
-      return null;
+      throw error; // Re-lancer l'erreur pour la gestion dans le composant
     }
   }
 

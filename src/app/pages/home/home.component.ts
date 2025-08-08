@@ -162,7 +162,14 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     
     try {
-      const subscription = await this.pushNotificationService.subscribeToPushNotifications();
+      // Timeout de 10 secondes pour éviter les blocages
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout: La demande a pris trop de temps')), 10000);
+      });
+
+      const subscriptionPromise = this.pushNotificationService.subscribeToPushNotifications();
+      
+      const subscription = await Promise.race([subscriptionPromise, timeoutPromise]) as any;
       
       if (subscription) {
         this.isSubscribed = true;
@@ -173,7 +180,19 @@ export class HomeComponent implements OnInit {
       }
     } catch (error) {
       console.error('Erreur lors de l\'abonnement:', error);
-      this.showNotificationMessage('❌ Erreur lors de l\'abonnement aux notifications: ' + error, 'danger');
+      let errorMessage = 'Erreur lors de l\'abonnement aux notifications';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Timeout')) {
+          errorMessage = 'La demande a pris trop de temps. Vérifiez votre connexion et réessayez.';
+        } else if (error.message.includes('Permission')) {
+          errorMessage = 'Permission refusée. Veuillez autoriser les notifications dans votre navigateur.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      this.showNotificationMessage('❌ ' + errorMessage, 'danger');
     } finally {
       this.isLoading = false;
     }

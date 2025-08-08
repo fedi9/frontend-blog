@@ -3,12 +3,17 @@
   <a routerLink="/home">Home</a>
 
   <ng-container *ngIf="!isLoggedIn(); else loggedInLinks">
-    <a routerLink="/login">Login</a>
-    <a routerLink="/register">Register</a>
+    <div class="auth-links">
+      <a routerLink="/login">Login</a>
+      <a routerLink="/register">Register</a>
+    </div>
   </ng-container>
 
   <ng-template #loggedInLinks>
-    <a [routerLink]="getDashboardRoute()">Dashboard</a>
-    <button (click)="logout()">Logout</button>
+    <div class="logged-in-links">
+      <app-notification-bell></app-notification-bell>
+      <a [routerLink]="getDashboardRoute()">Dashboard</a>
+      <button (click)="logout()">Logout</button>
+    </div>
   </ng-template>
 </nav>

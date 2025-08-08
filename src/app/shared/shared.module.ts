@@ -2,27 +2,30 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
-import { NotificationSettingsComponent } from './components/notification-settings/notification-settings.component';
+import { NotificationBellComponent } from './components/notification-bell/notification-bell.component';
 
 @NgModule({
   declarations: [
     NavbarComponent,
-    NotificationSettingsComponent
+    NotificationBellComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    RouterModule
   ],
   exports: [
     NavbarComponent,
-    NotificationSettingsComponent,
+    NotificationBellComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    RouterModule
   ]
 })
 export class SharedModule { }

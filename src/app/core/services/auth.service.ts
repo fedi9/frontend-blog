@@ -19,16 +19,16 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return !!sessionStorage.getItem('token');
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('role');
   }
 
   getUserRole(): string | null {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return null;
 
     try {
@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   getCurrentUser(): User | null {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return null;
 
     try {
@@ -57,7 +57,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   register(userData: { username: string; email: string; password: string }): Observable<any> {
