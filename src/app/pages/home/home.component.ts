@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ArticleService, PaginatedResponse } from 'src/app/core/services/article.service';
 import { Article } from 'src/app/core/models/article.model';
 import { PushNotificationService } from '../../core/services/push-notification.service';
+import { SocketService, ArticleLikeEvent } from '../../core/services/socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   articles: Article[] = [];
   loading = true;
 
@@ -32,15 +34,68 @@ export class HomeComponent implements OnInit {
   notificationMessage = '';
   notificationMessageClass = '';
 
+  // Socket properties
+  private socketSubscription = new Subscription();
+
   constructor(
     private articleService: ArticleService,
-    private pushNotificationService: PushNotificationService
+    private pushNotificationService: PushNotificationService,
+    private socketService: SocketService
   ) {}
 
   ngOnInit(): void {
     this.loadArticles();
     this.loadAvailableTags();
     this.initializeNotifications();
+    this.setupSocketListeners();
+  }
+
+  ngOnDestroy(): void {
+    this.socketSubscription.unsubscribe();
+  }
+
+  private setupSocketListeners(): void {
+    // Se connecter au Socket.io si pas déjà connecté
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (token && !this.socketService.isSocketConnected()) {
+      this.socketService.connect(token);
+    }
+
+    // Écouter les événements de likes d'articles
+    this.socketSubscription.add(
+      this.socketService.articleLiked$.subscribe((event: ArticleLikeEvent | null) => {
+        if (event) {
+          console.log('👍 Événement de like reçu:', event);
+          this.updateArticleLike(event);
+        }
+      })
+    );
+  }
+
+  private updateArticleLike(event: ArticleLikeEvent): void {
+    const article = this.articles.find(a => a._id === event.articleId);
+    if (article) {
+      article.likeCount = event.likeCount;
+      // Mettre à jour userLiked seulement si c'est l'utilisateur actuel
+      if (event.userId === this.getCurrentUserId()) {
+        article.userLiked = event.userLiked;
+      }
+      console.log(`👍 Article ${event.articleId} mis à jour: ${event.likeCount} likes`);
+    }
+  }
+
+  private getCurrentUserId(): string | null {
+    // Récupérer l'ID de l'utilisateur actuel depuis le localStorage ou sessionStorage
+    const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return user.id || user._id;
+      } catch (error) {
+        console.error('Erreur lors du parsing de l\'utilisateur:', error);
+      }
+    }
+    return null;
   }
 
   loadArticles(page: number = 1): void {
@@ -56,11 +111,21 @@ export class HomeComponent implements OnInit {
         
         // Charger le statut de like pour chaque article
         this.loadLikeStatusForArticles();
+        
+        // Rejoindre les rooms Socket.io pour chaque article
+        this.joinArticleRooms();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des articles :', err);
         this.loading = false;
       }
+    });
+  }
+
+  private joinArticleRooms(): void {
+    // Rejoindre les rooms Socket.io pour chaque article
+    this.articles.forEach(article => {
+      this.socketService.joinArticle(article._id);
     });
   }
 

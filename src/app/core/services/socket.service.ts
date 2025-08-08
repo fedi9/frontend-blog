@@ -16,6 +16,13 @@ export interface NotificationEvent {
   createdAt?: Date;
 }
 
+export interface ArticleLikeEvent {
+  articleId: string;
+  likeCount: number;
+  userLiked: boolean;
+  userId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,11 +37,13 @@ export class SocketService {
   private commentAddedSubject = new BehaviorSubject<CommentEvent | null>(null);
   private notificationSubject = new BehaviorSubject<NotificationEvent | null>(null);
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
+  private articleLikedSubject = new BehaviorSubject<ArticleLikeEvent | null>(null);
 
   // Observables publics
   public commentAdded$ = this.commentAddedSubject.asObservable();
   public notification$ = this.notificationSubject.asObservable();
   public connectionStatus$ = this.connectionStatusSubject.asObservable();
+  public articleLiked$ = this.articleLikedSubject.asObservable();
 
   constructor() {}
 
@@ -93,6 +102,12 @@ export class SocketService {
     this.socket.on('comment_added', (data: CommentEvent) => {
       console.log('💬 Événement comment_added reçu:', data);
       this.commentAddedSubject.next(data);
+    });
+
+    // Écouter les likes d'articles
+    this.socket.on('article_liked', (data: ArticleLikeEvent) => {
+      console.log('👍 Événement article_liked reçu:', data);
+      this.articleLikedSubject.next(data);
     });
 
     // Écouter les notifications
