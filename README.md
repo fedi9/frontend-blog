@@ -443,6 +443,42 @@ Pour la production, configurez :
 - **Angular DevTools** : Extension browser pour le debugging
 - **Console Logs** : Logs structurés pour le développement
 
+### Dépannage des Erreurs Courantes
+
+#### Erreur "ERR_CONNECTION_REFUSED" lors de l'inscription/connexion
+
+**Symptômes :**
+```
+POST http://localhost:5000/api/auth/register net::ERR_CONNECTION_REFUSED
+HttpErrorResponse {status: 0, statusText: 'Unknown Error'}
+```
+
+**Solutions :**
+1. **Vérifier les ports du backend :**
+   - User Service doit fonctionner sur le port **5001**
+   - Article Service doit fonctionner sur le port **5002**
+   
+2. **Démarrer les services backend :**
+   ```bash
+   # Terminal 1 - User Service
+   cd ../blog-collaboratif-backend/user-service
+   npm run dev
+   
+   # Terminal 2 - Article Service  
+   cd ../blog-collaboratif-backend/article-service
+   npm run dev
+   ```
+
+3. **Vérifier MongoDB :**
+   ```bash
+   sudo systemctl status mongod
+   ```
+
+4. **URLs correctes dans les services :**
+   - `auth.service.ts` : `http://localhost:5001/api/auth`
+   - `user.service.ts` : `http://localhost:5001/api/users`
+   - `article.service.ts` : `http://localhost:5002/api/articles`
+
 ### Extensions VS Code Recommandées
 - Angular Language Service
 - TypeScript Importer
