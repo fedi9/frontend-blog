@@ -15,11 +15,14 @@ export class NavbarComponent {
     return this.authService.isLoggedIn();
   }
 
-getDashboardRoute(): string {
-  const role = this.authService.getUserRole();
-  return role ? `/dashboard/${role.toLowerCase()}` : '/home';
-}
+  isAdmin(): boolean {
+    return this.authService.getUserRole() === 'Admin';
+  }
 
+  getDashboardRoute(): string {
+    const role = this.authService.getUserRole();
+    return role ? `/dashboard/${role.toLowerCase()}` : '/home';
+  }
 
   logout(): void {
     this.authService.logout();

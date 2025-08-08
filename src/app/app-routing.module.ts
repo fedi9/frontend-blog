@@ -8,6 +8,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { AdminDashboardComponent } from './pages/dashboard/admin-dashboard/admin-dashboard.component';
 import { EditorDashboardComponent } from './pages/dashboard/editor-dashboard/editor-dashboard.component';
 import { RedacteurDashboardComponent } from './pages/dashboard/redacteur-dashboard/redacteur-dashboard.component';
+import { StatsDashboardComponent } from './pages/dashboard/admin-dashboard/stats-dashboard/stats-dashboard.component';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
@@ -24,6 +25,12 @@ const routes: Routes = [
   {
     path: 'dashboard/admin',
     component: AdminDashboardComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['Admin'] }
+  },
+  {
+    path: 'dashboard/admin/stats',
+    component: StatsDashboardComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['Admin'] }
   },
