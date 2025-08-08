@@ -460,6 +460,4 @@ Pour la production, configurez :
 6. Push vers la branche (`git push origin feature/AmazingFeature`)
 7. Ouvrir une Pull Request
 
-## 📄 Licence
 
-Ce projet est sous licence ISC. Voir le fichier `LICENSE` pour plus de détails.
