@@ -62,7 +62,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // Modals utilisateurs
   showEditUserModal = false;
-  showDeleteUserModal = false;
+  // showDeleteUserModal = false;
   selectedUser: User | null = null;
   newUserRole = '';
 
@@ -337,31 +337,31 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  openDeleteUserModal(user: User): void {
-    this.selectedUser = user;
-    this.showDeleteUserModal = true;
-  }
+  // openDeleteUserModal(user: User): void {
+  //   this.selectedUser = user;
+  //   this.showDeleteUserModal = true;
+  // }
 
-  deleteUser(): void {
-    if (!this.selectedUser) return;
+  // deleteUser(): void {
+  //   if (!this.selectedUser) return;
 
-    const username = this.selectedUser.username; // Stocker le nom avant de le supprimer
+  //   const username = this.selectedUser.username; // Stocker le nom avant de le supprimer
 
-    this.userService.deleteUser(this.selectedUser._id).subscribe({
-      next: () => {
-        console.log('Utilisateur supprimé avec succès');
-        // Recharger la liste des utilisateurs
-        this.loadUsers(this.userCurrentPage);
-        this.showDeleteUserModal = false;
-        this.selectedUser = null;
+  //   this.userService.deleteUser(this.selectedUser._id).subscribe({
+  //     next: () => {
+  //       console.log('Utilisateur supprimé avec succès');
+  //       // Recharger la liste des utilisateurs
+  //       this.loadUsers(this.userCurrentPage);
+  //       this.showDeleteUserModal = false;
+  //       this.selectedUser = null;
         
-        // Afficher un message de succès
-        alert(`Utilisateur ${username} supprimé avec succès !`);
-      },
-      error: (err) => {
-        console.error('Erreur lors de la suppression:', err);
-        alert('Erreur lors de la suppression: ' + (err.error?.message || err.message));
-      }
-    });
-  }
+  //       // Afficher un message de succès
+  //       alert(`Utilisateur ${username} supprimé avec succès !`);
+  //     },
+  //     error: (err) => {
+  //       console.error('Erreur lors de la suppression:', err);
+  //       alert('Erreur lors de la suppression: ' + (err.error?.message || err.message));
+  //     }
+  //   });
+  // }
 }

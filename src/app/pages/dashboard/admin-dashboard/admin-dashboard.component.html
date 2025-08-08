@@ -154,7 +154,7 @@
   </div>
 
   <!-- POPUP DE SUPPRESSION UTILISATEUR -->
-  <div class="admin-modal-bg" *ngIf="showDeleteUserModal">
+  <!-- <div class="admin-modal-bg" *ngIf="showDeleteUserModal">
     <div class="admin-modal">
       <h3>Confirmation de suppression</h3>
       <p>Êtes-vous sûr de vouloir supprimer l'utilisateur : <strong>{{ selectedUser?.username }}</strong> ?</p>
@@ -164,7 +164,7 @@
         <button (click)="showDeleteUserModal = false" class="admin-btn-secondary">Annuler</button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <hr />
 
@@ -323,10 +323,11 @@
           <span class="material-icons">edit</span>
           Modifier
         </button>
-        <button class="admin-btn-delete" (click)="openDeleteUserModal(user)">
+        <!-- Bouton supprimer caché pour les utilisateurs -->
+        <!-- <button class="admin-btn-delete" (click)="openDeleteUserModal(user)">
           <span class="material-icons">delete</span>
           Supprimer
-        </button>
+        </button> -->
       </div>
     </div>
   </div>

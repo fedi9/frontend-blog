@@ -15,9 +15,9 @@ import { roleGuard } from './core/guards/role.guard';
 import { LecteurDashboardComponent } from './pages/dashboard/lecteur-dashboard/lecteur-dashboard.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  { path: 'home', component: HomeComponent },
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 
@@ -54,7 +54,7 @@ const routes: Routes = [
   },
 
   // 404 (optionnel)
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({

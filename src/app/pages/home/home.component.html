@@ -7,14 +7,13 @@
     </p>
   </div>
 
-  <!-- Test des notifications push -->
+  <!-- Status Notifications Recepient-->
   <div class="notifications-test-section" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
     <h3 style="color: #007bff; margin-bottom: 15px;">
-      🔔 Test des Notifications Push
+      🔔 Status Notifications Recepient
     </h3>
     <div class="notification-test-container" style="padding: 20px; background: white; border-radius: 8px;">
       
-      <!-- Support -->
       <div class="status-section" style="margin-bottom: 15px;">
         <strong>Support :</strong>
         <span [class]="isSupported ? 'text-success' : 'text-danger'">
@@ -22,7 +21,6 @@
         </span>
       </div>
 
-      <!-- Permissions -->
       <div class="status-section" style="margin-bottom: 15px;">
         <strong>Permissions :</strong>
         <span [class]="getPermissionClass()">
@@ -30,7 +28,7 @@
         </span>
       </div>
 
-      <!-- Abonnement -->
+  
       <div class="status-section" style="margin-bottom: 20px;">
         <strong>Abonnement :</strong>
         <span [class]="isSubscribed ? 'text-success' : 'text-warning'">
@@ -38,7 +36,7 @@
         </span>
       </div>
 
-      <!-- Boutons -->
+     
       <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
         <button 
           class="btn btn-primary" 
@@ -62,7 +60,6 @@
         </button>
       </div>
 
-      <!-- Messages -->
       <div *ngIf="notificationMessage" class="alert" [class]="notificationMessageClass" style="margin-top: 15px;">
         {{ notificationMessage }}
       </div>

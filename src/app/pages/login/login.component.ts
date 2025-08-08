@@ -64,14 +64,20 @@ export class LoginComponent implements OnInit {
 
           // 🔍 Debug : afficher le contenu du token dans la console
           const payload = JSON.parse(atob(response.token.split('.')[1]));
-          console.log('Contenu du token :', payload); // <-- Cette ligne t'aidera à déboguer
+          console.log('Contenu du token :', payload);
 
           sessionStorage.setItem('role', payload.role);
 
           // Redirection selon rôle
           const role = payload.role.toLowerCase();
           console.log('Redirection vers:', `/dashboard/${role}`);
-          this.router.navigate([`/dashboard/${role}`]);
+          
+          // Rediriger vers le dashboard approprié ou vers home pour les lecteurs
+          if (role === 'lecteur') {
+            this.router.navigate(['/home']);
+          } else {
+            this.router.navigate([`/dashboard/${role}`]);
+          }
         },
         error: (err) => {
           console.error('Erreur de connexion', err);
